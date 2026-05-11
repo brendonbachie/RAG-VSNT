@@ -1,0 +1,31 @@
+# Vector index
+.rag_index/
+
+# Documents (keep the folder, not the files)
+docs/*
+!docs/.gitkeep
+
+# Python
+.venv/
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+
+# Environment variables
+.env
+*.env
+
+# Document files
+*.pdf
+*.docx
+*.pptx
+*.xlsx
+
+# Archives
+*.zip
+*.tar.gz
+
+# Streamlit
+.streamlit/
+.claude/

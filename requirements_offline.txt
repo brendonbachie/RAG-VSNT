@@ -1,0 +1,15 @@
+# RAG VSNT – Dependências (modo 100% OFFLINE)
+# Instale com: pip install -r requirements_offline.txt
+#
+# IMPORTANTE: na primeira execução os modelos de embedding e reranking são
+# baixados automaticamente pelo HuggingFace e ficam em cache local.
+# O Ollama e seu modelo LLM devem ser instalados separadamente (ver README).
+
+llama-index-core>=0.10.0
+llama-index-llms-ollama>=0.3.0              # integração com Ollama local
+llama-index-embeddings-huggingface>=0.3.0
+llama-index-retrievers-bm25>=0.3.0          # busca por palavras-chave (BM25)
+sentence-transformers>=3.0.0                # backend dos embeddings e reranking cross-encoder
+torch>=2.0.0                                # backend do sentence-transformers
+rank-bm25>=0.2.2                            # algoritmo BM25 usado pelo llama-index-retrievers-bm25
+streamlit>=1.35.0                           # interface web do chat RAG
