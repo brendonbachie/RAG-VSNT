@@ -55,8 +55,7 @@ async def documents_list(request: Request, db: AsyncSession = Depends(get_db)):
         SystemSettings.key.in_(["indexing_status", "indexing_last_completed_at", "indexing_last_error"])
     ))
     settings = {row.key: row.value for row in result.scalars()}
-    return templates.TemplateResponse("admin/documents.html", {
-        "request": request,
+    return templates.TemplateResponse(request, "admin/documents.html", {
         "current_user": request.state.current_user,
         "messages": [],
         "docs": docs,

@@ -143,11 +143,11 @@ async def auth_guard(request: Request, call_next):
 
 @app.exception_handler(403)
 async def forbidden_handler(request: Request, exc):
-    return templates.TemplateResponse("403.html", {"request": request, "current_user": getattr(request.state, "current_user", None), "messages": []}, status_code=403)
+    return templates.TemplateResponse(request, "403.html", {"current_user": getattr(request.state, "current_user", None), "messages": []}, status_code=403)
 
 @app.exception_handler(404)
 async def not_found_handler(request: Request, exc):
-    return templates.TemplateResponse("404.html", {"request": request, "current_user": getattr(request.state, "current_user", None), "messages": []}, status_code=404)
+    return templates.TemplateResponse(request, "404.html", {"current_user": getattr(request.state, "current_user", None), "messages": []}, status_code=404)
 
 
 # ── Routers ───────────────────────────────────────────────────────────────────

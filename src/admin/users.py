@@ -23,8 +23,7 @@ async def users_list(request: Request, db: AsyncSession = Depends(get_db)):
     require_admin(request)
     result = await db.execute(select(User).order_by(User.created_at))
     users = result.scalars().all()
-    return templates.TemplateResponse("admin/users.html", {
-        "request": request,
+    return templates.TemplateResponse(request, "admin/users.html", {
         "current_user": request.state.current_user,
         "messages": [],
         "users": users,
@@ -51,8 +50,8 @@ async def users_create(
     if existing.scalar_one_or_none():
         result = await db.execute(select(User).order_by(User.created_at))
         users = result.scalars().all()
-        return templates.TemplateResponse("admin/users.html", {
-            "request": request, "current_user": admin,
+        return templates.TemplateResponse(request, "admin/users.html", {
+            "current_user": admin,
             "messages": [("error", f"Usuário '{username}' já existe.")],
             "users": users, "temp_password": None, "new_username": None,
         })

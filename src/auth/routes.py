@@ -45,8 +45,8 @@ async def _set_setting(db: AsyncSession, key: str, value: str) -> None:
 async def setup_get(request: Request, db: AsyncSession = Depends(get_db)):
     if await _get_setting(db, "setup_complete") == "true":
         return RedirectResponse("/login", status_code=302)
-    return templates.TemplateResponse("setup.html", {
-        "request": request, "current_user": None, "messages": [], "error": None, "username": ""
+    return templates.TemplateResponse(request, "setup.html", {
+        "current_user": None, "messages": [], "error": None, "username": ""
     })
 
 
@@ -62,15 +62,15 @@ async def setup_post(
 
     username = username.strip()
     if not username or not password:
-        return templates.TemplateResponse("setup.html", {
-            "request": request, "current_user": None, "messages": [],
+        return templates.TemplateResponse(request, "setup.html", {
+            "current_user": None, "messages": [],
             "error": "Usuário e senha são obrigatórios.", "username": username,
         })
 
     import re
     if not re.match(r"^[a-zA-Z0-9_\-]{1,64}$", username):
-        return templates.TemplateResponse("setup.html", {
-            "request": request, "current_user": None, "messages": [],
+        return templates.TemplateResponse(request, "setup.html", {
+            "current_user": None, "messages": [],
             "error": "Nome de usuário inválido. Use apenas letras, números, _ e -.", "username": username,
         })
 
@@ -89,8 +89,8 @@ async def setup_post(
 async def login_get(request: Request):
     if get_session_data(request):
         return RedirectResponse("/", status_code=302)
-    return templates.TemplateResponse("login.html", {
-        "request": request, "current_user": None, "messages": [], "error": None
+    return templates.TemplateResponse(request, "login.html", {
+        "current_user": None, "messages": [], "error": None
     })
 
 
@@ -111,22 +111,22 @@ async def login_post(
 
     if user is None:
         await log_auth_event(db, LOGIN_FAILURE, None, username, reason="user_not_found")
-        return templates.TemplateResponse("login.html", {
-            "request": request, "current_user": None, "messages": [],
+        return templates.TemplateResponse(request, "login.html", {
+            "current_user": None, "messages": [],
             "error": "Usuário ou senha inválidos."
         })
 
     if not user.is_active:
         await log_auth_event(db, LOGIN_FAILURE, user.id, user.username, reason="user_inactive")
-        return templates.TemplateResponse("login.html", {
-            "request": request, "current_user": None, "messages": [],
+        return templates.TemplateResponse(request, "login.html", {
+            "current_user": None, "messages": [],
             "error": "Usuário ou senha inválidos."
         })
 
     if not verify_password(password, user.password_hash):
         await log_auth_event(db, LOGIN_FAILURE, user.id, user.username, reason="bad_password")
-        return templates.TemplateResponse("login.html", {
-            "request": request, "current_user": None, "messages": [],
+        return templates.TemplateResponse(request, "login.html", {
+            "current_user": None, "messages": [],
             "error": "Usuário ou senha inválidos."
         })
 

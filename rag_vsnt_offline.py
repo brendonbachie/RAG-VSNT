@@ -11,10 +11,13 @@ Melhorias v2:
 NENHUM dado sai da máquina. Zero chamadas externas em operação.
 """
 
+import re
 import sys
 import json
 import urllib.request
 from pathlib import Path
+
+import yaml
 
 from llama_index.core import (
     VectorStoreIndex,
@@ -60,11 +63,24 @@ RERANK_TOP_N = 3    # chunks finais enviados ao LLM após reranking
 SYSTEM_PROMPT = (
     "Você é um assistente técnico especializado no projeto VSNT "
     "(Veículo Subaquático Não Tripulado) da Marinha do Brasil. "
-    "Responda sempre em português brasileiro, com precisão técnica, "
-    "citando o documento e a seção quando possível. "
-    "Se a informação não estiver na base de conhecimento, diga claramente "
-    "que não encontrou na documentação e não invente dados."
+    "Responda sempre em português brasileiro formal e com precisão técnica.\n\n"
+    "Diretrizes obrigatórias:\n"
+    "1. Cite sempre o documento e a seção de onde a informação foi extraída.\n"
+    "2. Nunca invente dados técnicos, valores, medidas ou procedimentos.\n"
+    "3. Apresente especificações técnicas em formato de tabela.\n"
+    "4. Apresente procedimentos operacionais como passos numerados.\n"
+    "5. Se a informação solicitada não estiver na documentação disponível, "
+    "responda exatamente: "
+    '"Não encontrei essa informação na documentação disponível."'
 )
+
+# ─── Visibilidade de metadados ────────────────────────────────────────────────
+
+# Chaves de frontmatter YAML excluídas dos embeddings (não contribuem para busca semântica)
+EMBED_EXCLUDED_METADATA_KEYS = ["revision", "author", "date", "status"]
+
+# Chaves excluídas do contexto enviado ao LLM (ruído técnico sem valor para a resposta)
+LLM_EXCLUDED_METADATA_KEYS  = ["file_path", "creation_date", "last_modified_date"]
 
 # ─── Verificações de pré-requisito ───────────────────────────────────────────
 
@@ -106,8 +122,12 @@ def build_settings():
         temperature=0.1,         # respostas mais determinísticas/técnicas
         context_window=8192,
     )
-    Settings.embed_model = HuggingFaceEmbedding(model_name=EMBED_MODEL)
-    Settings.node_parser = MarkdownNodeParser()  # respeita headings Markdown
+    Settings.embed_model  = HuggingFaceEmbedding(model_name=EMBED_MODEL)
+    Settings.node_parser  = MarkdownNodeParser(
+        include_metadata=True,
+        include_prev_node_rel=True,
+    )
+    # chunk_size/chunk_overlap not applicable to MarkdownNodeParser (splits by structure)
 
 
 def _embedding_dims_match(index: VectorStoreIndex) -> bool:
@@ -126,6 +146,20 @@ def _embedding_dims_match(index: VectorStoreIndex) -> bool:
         return True
     except Exception:
         return True  # can't inspect — assume OK
+
+
+def _extract_frontmatter(file_path: str) -> dict:
+    """Lê o bloco YAML frontmatter de um arquivo .md e retorna como dict."""
+    try:
+        content = Path(file_path).read_text(encoding="utf-8")
+        match = re.match(r"^---\s*\n(.*?)\n---\s*\n", content, re.DOTALL)
+        if match:
+            data = yaml.safe_load(match.group(1)) or {}
+            # Convert non-string values so JSON serialization doesn't fail
+            return {k: str(v) for k, v in data.items()}
+    except Exception:
+        pass
+    return {}
 
 
 def load_or_build_index() -> VectorStoreIndex:
@@ -153,7 +187,12 @@ def load_or_build_index() -> VectorStoreIndex:
         required_exts=[".md", ".txt"],
         recursive=True,
         filename_as_id=True,
+        file_metadata=_extract_frontmatter,   # injeta YAML frontmatter como metadata
     ).load_data()
+
+    for doc in documents:
+        doc.excluded_embed_metadata_keys = EMBED_EXCLUDED_METADATA_KEYS
+        doc.excluded_llm_metadata_keys   = LLM_EXCLUDED_METADATA_KEYS
 
     if not documents:
         print(f"⚠️  Nenhum arquivo .md ou .txt encontrado em '{DOCS_DIR}'.")

@@ -41,8 +41,7 @@ async def chat_page(request: Request, db: AsyncSession = Depends(get_db)):
         return HTMLResponse(status_code=302, headers={"Location": "/setup"})
 
     current_user = getattr(request.state, "current_user", None)
-    return templates.TemplateResponse("chat.html", {
-        "request": request,
+    return templates.TemplateResponse(request, "chat.html", {
         "current_user": current_user,
         "messages": [],
     })

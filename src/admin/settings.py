@@ -57,8 +57,7 @@ async def settings_get(request: Request, db: AsyncSession = Depends(get_db)):
     current_timeout = await _get_setting(db, "session_timeout_seconds", "28800")
     available_models = _fetch_ollama_models()
 
-    return templates.TemplateResponse("admin/settings.html", {
-        "request": request,
+    return templates.TemplateResponse(request, "admin/settings.html", {
         "current_user": request.state.current_user,
         "messages": [],
         "current_model": current_model,

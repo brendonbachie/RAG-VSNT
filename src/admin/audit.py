@@ -39,8 +39,7 @@ async def audit_list(request: Request, db: AsyncSession = Depends(get_db)):
         except Exception:
             return payload_str[:80]
 
-    return templates.TemplateResponse("admin/audit.html", {
-        "request": request,
+    return templates.TemplateResponse(request, "admin/audit.html", {
         "current_user": request.state.current_user,
         "messages": [],
         "events": events,
