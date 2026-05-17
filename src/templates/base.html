@@ -1,0 +1,34 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>{% block title %}VSNT RAG{% endblock %}</title>
+  <link rel="stylesheet" href="/static/css/style.css">
+</head>
+<body>
+
+<nav>
+  <span class="brand">🔒 VSNT RAG</span>
+  {% if current_user %}
+    <a href="/">Chat</a>
+    {% if current_user.role == "admin" %}
+    <div class="nav-admin">
+      <a href="/admin/documents">Documentos</a>
+      <a href="/admin/users">Usuários</a>
+      <a href="/admin/settings">Configurações</a>
+      <a href="/admin/audit">Auditoria</a>
+    </div>
+    {% endif %}
+    <a href="/logout" class="nav-logout" style="margin-left:{% if current_user.role != 'admin' %}auto{% else %}1rem{% endif %}">Sair ({{ current_user.username }})</a>
+  {% endif %}
+</nav>
+
+{% for category, message in messages %}
+  <div class="flash {{ category }}">{{ message }}</div>
+{% endfor %}
+
+{% block content %}{% endblock %}
+
+</body>
+</html>

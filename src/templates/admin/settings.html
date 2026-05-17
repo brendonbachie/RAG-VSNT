@@ -1,0 +1,62 @@
+{% extends "base.html" %}
+{% block title %}Configurações — VSNT RAG{% endblock %}
+{% block content %}
+<div class="container">
+
+  {% if request.query_params.get('saved') %}
+  <div class="flash success">Configurações salvas com sucesso.</div>
+  {% endif %}
+
+  <div class="card">
+    <h2>Configurações do sistema</h2>
+
+    <form method="post" action="/admin/settings">
+
+      <div class="form-group">
+        <label>Modelo LLM ativo (Ollama)</label>
+        {% if available_models %}
+        <select name="ollama_model">
+          {% for m in available_models %}
+          <option value="{{ m }}" {% if m == current_model %}selected{% endif %}>{{ m }}</option>
+          {% endfor %}
+        </select>
+        <p class="text-muted mt-1">Modelo atual: <strong>{{ current_model }}</strong> — a troca tem efeito imediato na próxima consulta.</p>
+        {% else %}
+        <input type="text" name="ollama_model" value="{{ current_model }}" required>
+        <p class="text-muted mt-1">⚠️ Ollama não encontrado. Verifique se está rodando.</p>
+        {% endif %}
+      </div>
+
+      <div class="form-group">
+        <label>Timeout de sessão (segundos)</label>
+        <input type="number" name="session_timeout_seconds"
+               value="{{ current_timeout }}" min="60" max="86400" required>
+        <p class="text-muted mt-1">
+          Atual: {{ (current_timeout | int) // 3600 }}h
+          {{ ((current_timeout | int) % 3600) // 60 }}min
+          — Padrão: 28800 (8 horas)
+        </p>
+      </div>
+
+      <button class="btn btn-primary" type="submit">Salvar configurações</button>
+    </form>
+  </div>
+
+  <div class="card">
+    <h2>Modelos Ollama disponíveis</h2>
+    {% if available_models %}
+    <ul>
+      {% for m in available_models %}
+      <li{% if m == current_model %} style="font-weight:bold"{% endif %}>
+        {{ m }}{% if m == current_model %} ← ativo{% endif %}
+      </li>
+      {% endfor %}
+    </ul>
+    <p class="text-muted mt-1">Para instalar um novo modelo: <code>ollama pull &lt;nome&gt;</code></p>
+    {% else %}
+    <p class="text-muted">Ollama não encontrado ou sem modelos instalados.</p>
+    {% endif %}
+  </div>
+
+</div>
+{% endblock %}

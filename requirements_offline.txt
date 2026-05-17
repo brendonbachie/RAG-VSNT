@@ -5,6 +5,7 @@
 # baixados automaticamente pelo HuggingFace e ficam em cache local.
 # O Ollama e seu modelo LLM devem ser instalados separadamente (ver README).
 
+pyyaml>=6.0                                 # leitura de YAML frontmatter nos .md
 llama-index-core>=0.10.0
 llama-index-llms-ollama>=0.3.0              # integração com Ollama local
 llama-index-embeddings-huggingface>=0.3.0
@@ -12,4 +13,17 @@ llama-index-retrievers-bm25>=0.3.0          # busca por palavras-chave (BM25)
 sentence-transformers>=3.0.0                # backend dos embeddings e reranking cross-encoder
 torch>=2.0.0                                # backend do sentence-transformers
 rank-bm25>=0.2.2                            # algoritmo BM25 usado pelo llama-index-retrievers-bm25
-streamlit>=1.35.0                           # interface web do chat RAG
+streamlit>=1.35.0                           # interface web do chat RAG (terminal alternativo)
+
+# ── Web platform (novo) ───────────────────────────────────────────────────────
+fastapi>=0.111.0                            # framework web async
+uvicorn[standard]>=0.29.0                   # servidor ASGI
+jinja2>=3.1.0                               # templates HTML server-side
+python-multipart>=0.0.9                     # upload de arquivos via formulário
+sqlalchemy[asyncio]>=2.0.0                  # ORM async
+aiosqlite>=0.20.0                           # driver SQLite async para SQLAlchemy
+passlib[bcrypt]>=1.7.4                      # hash de senhas bcrypt
+itsdangerous>=2.1.2                         # cookies de sessão assinados
+pdfplumber>=0.11.0                          # extração de texto de PDF (pure Python)
+python-docx>=1.1.0                          # extração de texto de DOCX
+watchfiles>=0.21.0                          # monitoramento de pasta docs/ para auto-indexação

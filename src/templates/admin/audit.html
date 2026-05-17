@@ -1,0 +1,45 @@
+{% extends "base.html" %}
+{% block title %}Auditoria — VSNT RAG{% endblock %}
+{% block content %}
+<div class="container wide">
+  <div class="card">
+    <h2>Log de auditoria (últimos 100 eventos)</h2>
+    <div class="table-wrap">
+      <table>
+        <thead>
+          <tr><th>Data/Hora (UTC)</th><th>Evento</th><th>Usuário</th><th>Detalhes</th></tr>
+        </thead>
+        <tbody>
+          {% for ev in events %}
+          <tr>
+            <td class="text-muted" style="white-space:nowrap">{{ ev.created_at.strftime('%Y-%m-%d %H:%M:%S') }}</td>
+            <td>
+              {% set badge_class = {
+                'login_success': 'badge-green',
+                'login_failure': 'badge-red',
+                'logout': 'badge-gray',
+                'query': 'badge-blue',
+                'document_uploaded': 'badge-yellow',
+                'document_deleted': 'badge-red',
+                'index_triggered': 'badge-yellow',
+                'model_changed': 'badge-blue',
+                'user_created': 'badge-green',
+                'user_deactivated': 'badge-red',
+                'user_reactivated': 'badge-green',
+                'user_deleted': 'badge-red',
+                'settings_changed': 'badge-gray',
+              }.get(ev.event_type, 'badge-gray') %}
+              <span class="badge {{ badge_class }}">{{ ev.event_type }}</span>
+            </td>
+            <td>{{ ev.username_snapshot }}</td>
+            <td class="truncate text-muted">{{ summary(ev.payload) }}</td>
+          </tr>
+          {% else %}
+          <tr><td colspan="4" class="text-muted">Nenhum evento registrado.</td></tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    </div>
+  </div>
+</div>
+{% endblock %}

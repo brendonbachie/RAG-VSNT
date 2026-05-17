@@ -1,0 +1,83 @@
+{% extends "base.html" %}
+{% block title %}Usuários — VSNT RAG{% endblock %}
+{% block content %}
+<div class="container wide">
+
+  {% if temp_password %}
+  <div class="flash success">
+    Usuário <strong>{{ new_username }}</strong> criado. Senha temporária: <code>{{ temp_password }}</code>
+    — anote agora, ela não será exibida novamente.
+  </div>
+  {% endif %}
+
+  <div class="card">
+    <h2>Usuários do sistema</h2>
+    <div class="table-wrap">
+      <table>
+        <thead>
+          <tr>
+            <th>Usuário</th><th>Papel</th><th>Status</th>
+            <th>Criado em</th><th>Último acesso</th><th>Ações</th>
+          </tr>
+        </thead>
+        <tbody>
+          {% for u in users %}
+          <tr>
+            <td>{{ u.username }}</td>
+            <td>
+              <span class="badge {% if u.role == 'admin' %}badge-blue{% else %}badge-gray{% endif %}">
+                {{ u.role }}
+              </span>
+            </td>
+            <td>
+              <span class="badge {% if u.is_active %}badge-green{% else %}badge-red{% endif %}">
+                {% if u.is_active %}Ativo{% else %}Inativo{% endif %}
+              </span>
+            </td>
+            <td class="text-muted">{{ u.created_at.strftime('%Y-%m-%d %H:%M') }}</td>
+            <td class="text-muted">
+              {% if u.last_login_at %}{{ u.last_login_at.strftime('%Y-%m-%d %H:%M') }}{% else %}—{% endif %}
+            </td>
+            <td>
+              {% if u.id != current_user.id %}
+              <form method="post" action="/admin/users/{{ u.id }}/toggle-active" style="display:inline">
+                <button class="btn btn-sm {% if u.is_active %}btn-warning{% else %}btn-success{% endif %}">
+                  {% if u.is_active %}Desativar{% else %}Reativar{% endif %}
+                </button>
+              </form>
+              <form method="post" action="/admin/users/{{ u.id }}/delete" style="display:inline"
+                    onsubmit="return confirm('Excluir usuário {{ u.username }}?')">
+                <button class="btn btn-sm btn-danger">Excluir</button>
+              </form>
+              {% else %}
+                <span class="text-muted">(você)</span>
+              {% endif %}
+            </td>
+          </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    </div>
+  </div>
+
+  <div class="card">
+    <h2>Novo usuário</h2>
+    <form method="post" action="/admin/users">
+      <div class="form-group">
+        <label>Nome de usuário</label>
+        <input type="text" name="username" required maxlength="64" pattern="[a-zA-Z0-9_\-]+">
+      </div>
+      <div class="form-group">
+        <label>Papel</label>
+        <select name="role">
+          <option value="operator">Operador</option>
+          <option value="admin">Administrador</option>
+        </select>
+      </div>
+      <p class="text-muted mb-1">Uma senha temporária será gerada automaticamente.</p>
+      <button class="btn btn-primary" type="submit">Criar usuário</button>
+    </form>
+  </div>
+
+</div>
+{% endblock %}

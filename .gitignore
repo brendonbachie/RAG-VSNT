@@ -29,3 +29,17 @@ __pycache__/
 # Streamlit
 .streamlit/
 .claude/
+
+# Web app — local database and session secret
+data/
+*.db
+*.db-shm
+*.db-wal
+.session_secret
+
+# Misc
+.DS_Store
+Thumbs.db
+*.tmp
+*.swp
+*.log

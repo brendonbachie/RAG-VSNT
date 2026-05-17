@@ -1,0 +1,29 @@
+{% extends "base.html" %}
+{% block title %}Configuração Inicial — VSNT RAG{% endblock %}
+{% block content %}
+<div class="container auth-card">
+  <div class="card">
+    <h1>VSNT RAG — Configuração Inicial</h1>
+    <p class="text-muted mb-1">Crie a conta de administrador para começar. Nenhuma conexão com a internet é necessária.</p>
+
+    {% if error %}
+      <div class="flash error">{{ error }}</div>
+    {% endif %}
+
+    <form method="post" action="/setup">
+      <div class="form-group">
+        <label for="username">Nome de usuário</label>
+        <input type="text" id="username" name="username" required autofocus
+               maxlength="64" pattern="[a-zA-Z0-9_\-]+"
+               title="Apenas letras, números, _ e -"
+               value="{{ username or '' }}">
+      </div>
+      <div class="form-group">
+        <label for="password">Senha</label>
+        <input type="password" id="password" name="password" required>
+      </div>
+      <button type="submit" class="btn btn-primary">Criar conta de administrador</button>
+    </form>
+  </div>
+</div>
+{% endblock %}

@@ -1,0 +1,24 @@
+{% extends "base.html" %}
+{% block title %}Chat — VSNT RAG{% endblock %}
+{% block content %}
+<div class="container wide">
+  <div class="chat-wrapper">
+    <div class="chat-messages" id="chatMessages">
+      <div class="chat-msg bot">
+        <div class="bubble">Olá! Faça sua pergunta sobre a documentação técnica do VSNT.</div>
+      </div>
+    </div>
+
+    <div class="chat-input-area">
+      <textarea id="questionInput" rows="2"
+                placeholder="Digite sua pergunta aqui... (Enter para enviar, Shift+Enter para nova linha)"
+                autofocus></textarea>
+      <div style="display:flex;flex-direction:column;gap:0.4rem;">
+        <button class="btn btn-primary" id="sendBtn" onclick="sendMessage()">Enviar</button>
+        <button class="btn btn-sm" style="background:#eee;color:#444" onclick="resetChat()">Limpar</button>
+      </div>
+    </div>
+  </div>
+</div>
+<script src="/static/js/chat.js"></script>
+{% endblock %}
